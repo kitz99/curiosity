@@ -11,7 +11,7 @@ module Constants
       'LEFT' => 'WEST',
       'RIGHT' => 'EAST'
     },
-    'SOUH' => {
+    'SOUTH' => {
       'LEFT' => 'WEST',
       'RIGHT' => 'EAST'
     },

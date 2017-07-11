@@ -1,1 +1,2 @@
 gem 'activesupport'
+gem 'minitest'

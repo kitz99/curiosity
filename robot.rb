@@ -13,7 +13,9 @@ class Robot
   end
 
   def report
-    puts %Q[#{x}, #{y}, #{facing}]
+    response =  %Q[#{x}, #{y}, #{facing}]
+    puts response
+    response
   end
 
   def current_position=(values)
@@ -30,7 +32,7 @@ class Robot
 
   def process(raw_instruction)
     if raw_instruction.start_with?("PLACE")
-      self.current_position = Utils.build_place_instruction(raw_instruction)
+      self.current_position = Utils.build_place_instruction(raw_instruction, true)
       return
     end
 

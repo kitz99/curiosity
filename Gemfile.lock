@@ -17,6 +17,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  minitest
 
 BUNDLED WITH
    1.14.5
