@@ -1,38 +1,29 @@
-require_relative 'utils'
+require_relative 'robot_helpers'
 require_relative 'constants'
 
 class Robot
-  include Utils
+  attr_reader :x, :y, :facing, :commands, :x_bound, :y_bound
   include Constants
-  attr_accessor :x, :y, :facing
+  include RobotHelpers
 
-  def initialize(x, y, facing)
-    @x = x.to_i
-    @y = y.to_i
-    @facing = facing
+  def initialize(raw_commands, x_bound, y_bound)
+    @x_bound, @y_bound = [x_bound, y_bound]
+    @commands = clear_commands(raw_commands)
+    place = build_place_instruction(@commands.first)
+    @x, @y, @facing = place.values
   end
 
-  def report
-    response =  %Q[#{x}, #{y}, #{facing}]
-    puts response
-    response
-  end
-
-  def current_position=(values)
-    temp_x = values[:x].to_i if values[:x]
-    temp_y = values[:y].to_i if values[:y]
-    temp_f = values[:facing].upcase if values[:facing]
-
-    if (0..4).include?(temp_x) && (0..4).include?(temp_y)
-      @x = temp_x
-      @y = temp_y
-      @facing = temp_f
+  def call
+    last_report = ''
+    @commands[1..-1].each do |raw_instruction|
+      last_report = process(raw_instruction)
     end
+    last_report
   end
 
   def process(raw_instruction)
     if raw_instruction.start_with?("PLACE")
-      self.current_position = Utils.build_place_instruction(raw_instruction, true)
+      self.current_position = build_place_instruction(raw_instruction, true)
       return
     end
 
@@ -52,21 +43,28 @@ class Robot
 
   private
 
-  def current_movement
-    MOVEMENTS[facing]
+  def current_position=(values)
+    temp_x = values[:x].to_i if values[:x]
+    temp_y = values[:y].to_i if values[:y]
+    temp_f = values[:facing].upcase if values[:facing]
+
+    if (0..x_bound).include?(temp_x) && (0..y_bound).include?(temp_y)
+      @x = temp_x
+      @y = temp_y
+      @facing = temp_f
+    end
+  end
+
+  def report
+    %Q[#{x}, #{y}, #{facing}]
   end
 
   def move
     dx, dy = current_movement
-    temp_x = x + dx
-    temp_y = y + dy
-    if (0..4).include?(temp_x) && (0..4).include?(temp_y)
-      @x = temp_x
-      @y = temp_y
-    end
+    self.current_position = { x: x + dx, y: y + dy, facing: @facing }
   end
 
   def change_orientation(direction)
-    @facing = DIRECTIONS[facing][direction]
+    @facing = DIRECTIONS[@facing.to_sym][direction.upcase.to_sym]
   end
 end
